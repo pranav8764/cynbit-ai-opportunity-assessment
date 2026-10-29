@@ -49,7 +49,7 @@ export OPENROUTER_MODEL=nvidia/nemotron-3.5-super-vl:free   # default: verified 
 # Jev Router alternative: OPENROUTER_MODEL=typesafe/jev-router + JEV_COST_TIER=low (preference, NOT a price cap, cost not fixed)
 python3 -m poc.review_miner
 ```
-`JEV_COST_TIER` is only sent when the model is `typesafe/jev-router`. The run prints which model actually served each response (the router chooses) and writes the same two output files. Live results are pending until an API key is available; nothing in `out/` should be presented as model output unless produced by a live run.
+`JEV_COST_TIER` is only sent when the model is `typesafe/jev-router`. The run prints which model actually served each response (the router chooses) and writes the same two output files. First live run completed 2026-10-29 on the free model above: 15/15 synthetic reviews classified, 35 aspects, summary in `docs/live-run-2026-10-29.md`. "Negative mentions" counts extracted aspects, not unique reviews. Nothing in `out/` should be presented as model output unless produced by a live run.
 
 ## Tests
 ```bash
