@@ -1,0 +1,17 @@
+{
+  "r01": [{"category": "service_speed", "sentiment": "negative", "severity": 4, "evidence": "Waited almost 40 minutes for our order"}],
+  "r02": [{"category": "product_quality", "sentiment": "positive", "severity": 2, "evidence": "The paneer tikka was genuinely good"}, {"category": "service_speed", "sentiment": "negative", "severity": 4, "evidence": "the service was so slow we nearly left before dessert"}],
+  "r03": [{"category": "staff_behavior", "sentiment": "negative", "severity": 4, "evidence": "The manager was rude"}, {"category": "pricing_billing", "sentiment": "negative", "severity": 4, "evidence": "charged us for an extra dessert we never ordered"}],
+  "r04": [{"category": "cleanliness_ambience", "sentiment": "positive", "severity": 1, "evidence": "Nice ambience and clean tables"}, {"category": "service_speed", "sentiment": "negative", "severity": 2, "evidence": "Food took a while"}],
+  "r05": [{"category": "service_speed", "sentiment": "negative", "severity": 4, "evidence": "Took forever to get seated and then forever again to get the bill"}],
+  "r06": [{"category": "cleanliness_ambience", "sentiment": "negative", "severity": 4, "evidence": "Tables were sticky and the washroom was not clean"}],
+  "r07": [{"category": "service_speed", "sentiment": "negative", "severity": 3, "evidence": "another 35 minutes waiting for a simple coffee"}],
+  "r08": [{"category": "staff_behavior", "sentiment": "positive", "severity": 1, "evidence": "Ramesh at the counter was super helpful"}, {"category": "service_speed", "sentiment": "positive", "severity": 1, "evidence": "Quick service too"}],
+  "r09": [{"category": "pricing_billing", "sentiment": "negative", "severity": 3, "evidence": "Portions have shrunk but prices went up"}],
+  "r10": [{"category": "product_quality", "sentiment": "negative", "severity": 3, "evidence": "my first order was made wrong"}, {"category": "staff_behavior", "sentiment": "positive", "severity": 2, "evidence": "they fixed it quickly and politely"}],
+  "r11": [{"category": "product_quality", "sentiment": "negative", "severity": 4, "evidence": "The coffee machine has been broken for two weeks and half the menu is unavailable"}],
+  "r12": [{"category": "staff_behavior", "sentiment": "positive", "severity": 1, "evidence": "Staff is polite"}, {"category": "product_quality", "sentiment": "negative", "severity": 2, "evidence": "the cold brew tasted watered down"}],
+  "r13": [{"category": "pricing_billing", "sentiment": "negative", "severity": 4, "evidence": "The bill had a service charge nobody mentioned"}],
+  "r14": [{"category": "product_quality", "sentiment": "positive", "severity": 1, "evidence": "Best croissant in Jaipur"}, {"category": "service_speed", "sentiment": "positive", "severity": 1, "evidence": "Service was fast and friendly"}],
+  "r15": [{"category": "staff_behavior", "sentiment": "negative", "severity": 4, "evidence": "A staff member was arguing loudly with a customer"}]
+}
