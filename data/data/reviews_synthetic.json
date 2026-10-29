@@ -1,0 +1,17 @@
+[
+  {"id": "r01", "branch": "Jaipur C-Scheme", "date": "2026-10-03", "rating": 2, "text": "Waited almost 40 minutes for our order even though the place was half empty. Nobody apologised."},
+  {"id": "r02", "branch": "Jaipur C-Scheme", "date": "2026-10-05", "rating": 3, "text": "The paneer tikka was genuinely good, but the service was so slow we nearly left before dessert."},
+  {"id": "r03", "branch": "Jaipur C-Scheme", "date": "2026-10-08", "rating": 1, "text": "The manager was rude when I pointed out a billing error. They charged us for an extra dessert we never ordered."},
+  {"id": "r04", "branch": "Jaipur C-Scheme", "date": "2026-10-11", "rating": 4, "text": "Nice ambience and clean tables. Food took a while but the staff kept us updated."},
+  {"id": "r05", "branch": "Jaipur C-Scheme", "date": "2026-10-14", "rating": 2, "text": "Took forever to get seated and then forever again to get the bill. Two visits in a row now."},
+  {"id": "r06", "branch": "Malviya Nagar", "date": "2026-10-02", "rating": 2, "text": "Tables were sticky and the washroom was not clean. Expected better at this price."},
+  {"id": "r07", "branch": "Malviya Nagar", "date": "2026-10-06", "rating": 3, "text": "Great, another 35 minutes waiting for a simple coffee. At least the coffee was decent."},
+  {"id": "r08", "branch": "Malviya Nagar", "date": "2026-10-09", "rating": 5, "text": "Ramesh at the counter was super helpful and remembered our usual order. Quick service too."},
+  {"id": "r09", "branch": "Malviya Nagar", "date": "2026-10-12", "rating": 2, "text": "Portions have shrunk but prices went up. Feels expensive for what you get now."},
+  {"id": "r10", "branch": "Malviya Nagar", "date": "2026-10-15", "rating": 4, "text": "Came back because my first order was made wrong, but they fixed it quickly and politely."},
+  {"id": "r11", "branch": "Vaishali Nagar", "date": "2026-10-04", "rating": 1, "text": "The coffee machine has been broken for two weeks and half the menu is unavailable."},
+  {"id": "r12", "branch": "Vaishali Nagar", "date": "2026-10-07", "rating": 4, "text": "Staff is polite and the place looks great, but the cold brew tasted watered down."},
+  {"id": "r13", "branch": "Vaishali Nagar", "date": "2026-10-10", "rating": 2, "text": "The bill had a service charge nobody mentioned, and the menu prices did not match what was charged."},
+  {"id": "r14", "branch": "Vaishali Nagar", "date": "2026-10-13", "rating": 5, "text": "Best croissant in Jaipur, hands down. Service was fast and friendly this time."},
+  {"id": "r15", "branch": "Vaishali Nagar", "date": "2026-10-16", "rating": 2, "text": "A staff member was arguing loudly with a customer at the next table. Very uncomfortable."}
+]
