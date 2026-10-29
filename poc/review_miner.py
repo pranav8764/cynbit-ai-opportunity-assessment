@@ -147,7 +147,7 @@ def summarize(classified):
                 "category": cat,
                 "negative_mentions": s["negative"],
                 "avg_negative_severity": avg_sev,
-                "priority_score": round(s["negative"] * (avg_sev or 0), 2),
+                "priority_score": round(s["sev_sum"], 2),  # raw severity sum; rounding avg first would drift (3.67*3=11.01 vs true 11)
                 "evidence_examples": s["evidence"][:3],
             })
         issues.sort(key=lambda x: x["priority_score"], reverse=True)
