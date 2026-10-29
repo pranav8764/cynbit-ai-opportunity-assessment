@@ -2,7 +2,7 @@
 
 ## Status
 - **Assigned:** Thu, Oct 29, 2026 (email from opportunities@cynbit.in)
-- **Deadline:** Sat, Oct 31, 2026, 4:45 PM IST
+- **Deadline:** Sat, Oct 31, 2026, 4:45 PM (timezone not stated in the email; very likely IST - the deadline is exactly 48h after the assignment email, sent 4:45 PM IST)
 - **Submission:** candidate portal link from the assignment email (repo URL + technical setup notes)
 - **Visibility rule:** Cynbit requires the repo to be **publicly accessible** at submission time. Keep this repo private while working; flip to public only when ready to submit.
 
@@ -30,7 +30,7 @@ Analyze Cynbit's website, services, and publicly available information. Identify
 3. **AI Opportunity Report** (`docs/opportunity-report.md`): industry analysis + the shortlist with rationale for the pick.
 4. **PoC** (`/poc` or Colab notebook): small working demo of the chosen opportunity.
 5. **Technical Approach Report** (`docs/technical-approach.md`): model choices, data pipeline, prompt engineering/architecture, execution plan.
-6. **Finalize**: clean commit history, flip repo public, submit on the candidate portal before Sat 4:45 PM IST.
+6. **Finalize**: clean commit history, flip repo public, submit on the candidate portal before Sat, Oct 31, 4:45 PM.
 
 ## Notes
 - The assignment email states no AI-assistance or collaboration restrictions.
