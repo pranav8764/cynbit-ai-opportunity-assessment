@@ -77,3 +77,18 @@ def test_categories_are_fixed_and_known():
     # the prompt contract: a small fixed category set, not free-form labels
     assert CATEGORIES == ["service_speed", "staff_behavior", "product_quality",
                           "pricing_billing", "cleanliness_ambience", "other"]
+
+def test_summarize_priority_uses_unrounded_severity_sum():
+    """Regression: priority must come from the raw severity sum, not the
+    rounded display average (3.67*3 = 11.01 would be wrong; true is 11)."""
+    classified = [
+        {"review_id": "a", "branch": "B1", "aspects": [
+            {"category": "product_quality", "sentiment": "negative", "severity": 4, "evidence": "x"}]},
+        {"review_id": "b", "branch": "B1", "aspects": [
+            {"category": "product_quality", "sentiment": "negative", "severity": 4, "evidence": "y"}]},
+        {"review_id": "c", "branch": "B1", "aspects": [
+            {"category": "product_quality", "sentiment": "negative", "severity": 3, "evidence": "z"}]},
+    ]
+    issue = summarize(classified)["B1"][0]
+    assert issue["avg_negative_severity"] == 3.67  # display rounding stays
+    assert issue["priority_score"] == 11  # not 11.01
