@@ -13,8 +13,8 @@ Keyword/dictionary tagging: small hand-written keyword lists per category
 
 ## Model
 The API classifier in `poc/review_miner.py` (fixed categories + structured
-output). Default model `typesafe/jev-router`, configurable via
-`OPENROUTER_MODEL`.
+output). Default model `nvidia/nemotron-3.5-super-vl:free` (a $0 OpenRouter model),
+configurable via `OPENROUTER_MODEL`.
 
 ## Method
 1. Hand-label the 15 synthetic reviews (plus any added later) with their true
@@ -33,3 +33,4 @@ output). Default model `typesafe/jev-router`, configurable via
   without the measurements above.
 - Live-model outputs are only reported from actual API runs, never from the
   mock fixtures.
+
