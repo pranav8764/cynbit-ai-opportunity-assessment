@@ -4,7 +4,13 @@
 - **Assigned:** Thu, Oct 29, 2026 (email from opportunities@cynbit.in)
 - **Deadline:** Sat, Oct 31, 2026, 4:45 PM (timezone not stated in the email or portal; very likely IST - the deadline is exactly 48h after the assignment email, sent 4:45 PM IST)
 - **Submission:** candidate portal (https://cynbit.in/candidate/cmt8cbikl000004l40fphlaj2) - 1 primary link + up to 4 additional links + optional notes
-- **Visibility rule:** the deliverable must be **publicly accessible** at submission time. Keep this repo private while working; flip to public only when ready to submit.
+- **Visibility:** this repo is public for submission.
+
+## Reports
+- [AI Opportunity Report](docs/AI_OPPORTUNITY_REPORT.md)
+- [Technical Approach Report](docs/TECHNICAL_APPROACH_REPORT.md)
+- [Live run output (15 synthetic reviews)](docs/live-run-2026-10-29.md)
+- [Evaluation plan (plan only, no results)](docs/evaluation-plan.md)
 
 ## Problem Statement (verbatim from the assignment)
 Analyze Cynbit's website, services, and publicly available information. Identify opportunities where AI/ML could improve Cynbit's business, internal processes, customer experience, or future products. Choose **one** opportunity and demonstrate how you would approach it.
@@ -63,6 +69,8 @@ data/reviews_synthetic.json       15 synthetic reviews, 3 branches (no real cust
 data/mock_classifications.json    canned model outputs for --mock mode
 poc/review_miner.py               classifier + aggregator + CLI
 tests/test_review_miner.py        offline tests
+docs/AI_OPPORTUNITY_REPORT.md     opportunity report
+docs/TECHNICAL_APPROACH_REPORT.md technical approach report
 docs/evaluation-plan.md           baseline-vs-model evaluation plan (no results yet)
 ```
 
@@ -70,3 +78,4 @@ docs/evaluation-plan.md           baseline-vs-model evaluation plan (no results 
 - Cynbit Technologies, Jaipur. Services: AI agents/automation, custom software, cloud, web/mobile, technical SEO (https://www.cynbit.in/services)
 - Products: Cynbit Studio (career/coding), TenantEase (property), Revio (review/reputation AI) (https://www.cynbit.in/products)
 - Case studies: https://www.cynbit.in/case-studies
+
