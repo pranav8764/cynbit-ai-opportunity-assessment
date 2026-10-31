@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cross-review issue mining - interactive demo</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; max-width: 960px; margin: 0 auto; padding: 24px 16px 64px; color: #1a1a1a; line-height: 1.45; }
+  h1 { font-size: 1.5rem; margin-bottom: 4px; }
+  h2 { font-size: 1.15rem; margin-top: 32px; }
+  .sub { color: #555; margin-top: 0; }
+  label { display: block; font-weight: 600; margin: 12px 0 4px; font-size: .9rem; }
+  input[type=text], input[type=password], textarea, select { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #bbb; border-radius: 6px; font: inherit; }
+  textarea { resize: vertical; }
+  button { background: #0b5fff; color: #fff; border: 0; border-radius: 6px; padding: 10px 18px; font: inherit; font-weight: 600; cursor: pointer; margin-top: 12px; }
+  button:disabled { background: #9db9ea; cursor: default; }
+  .note { background: #f4f6fb; border: 1px solid #dbe3f0; border-radius: 8px; padding: 10px 14px; font-size: .88rem; color: #333; margin: 14px 0; }
+  .status { margin: 12px 0 4px; font-size: .92rem; }
+  table { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: .87rem; }
+  th, td { border: 1px solid #ddd; padding: 6px 8px; text-align: left; vertical-align: top; }
+  th { background: #f0f2f7; }
+  .err { color: #b00020; }
+  code { background:#f0f2f7; padding:1px 5px; border-radius:4px; font-size:.85em; }
+</style>
+</head>
+<body>
+<h1>Cross-review issue mining - interactive demo</h1>
+<p class="sub">Proof of concept for the Cynbit AI/ML Engineer Intern assessment. An LLM extracts
+structured aspects (category, sentiment, severity, verbatim evidence) from free-text reviews;
+plain analytics then rank each branch's top issues by frequency x severity.
+Code and reports: <a href="https://github.com/pranav8764/cynbit-ai-opportunity-assessment">github.com/pranav8764/cynbit-ai-opportunity-assessment</a></p>
+
+<h2>1. Analyze your own review</h2>
+<div class="note">Live analysis calls the hardcoded OpenRouter <b>free</b> model
+<code>nvidia/nemotron-3.5-super-vl:free</code> from your browser using <b>your own</b>
+OpenRouter key (free keys are available at openrouter.ai). The key is used only for this
+page's requests and is never stored or sent anywhere else. Input capped at 2000 characters;
+at most 8 live analyses per page load.</div>
+<label for="key">Your OpenRouter API key (required for live analysis)</label>
+<input type="password" id="key" placeholder="sk-or-... (stays in your browser)">
+<label for="branch">Branch / location</label>
+<input type="text" id="branch" value="Jaipur C-Scheme">
+<label for="rating">Star rating</label>
+<select id="rating"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option></select>
+<label for="review">Review text</label>
+<textarea id="review" rows="5" placeholder="Paste any customer review here (max 2000 characters)"></textarea>
+<br><button id="analyzeBtn">Analyze review</button>
+<div class="status" id="customStatus"></div>
+<div id="customOut"></div>
+
+<h2>2. Run the 15-review sample batch</h2>
+<div class="note"><b>Canned replay</b> (default) instantly replays saved model responses through the
+same analytics pipeline - it proves the pipeline, not the model. <b>Live batch</b> sends all 15
+synthetic reviews from the repo to the free model one by one (about a minute) and needs your key above;
+at most 2 live batches per page load.</div>
+<button id="batchMockBtn">Run batch - canned replay</button>
+<button id="batchLiveBtn">Run batch - live LLM</button>
+<div class="status" id="batchStatus"></div>
+<div id="summaryOut"></div>
+<div id="aspectsOut"></div>
+
+<script>
+const CATEGORIES = ["service_speed","staff_behavior","product_quality","pricing_billing","cleanliness_ambience","other"];
+const SENTIMENTS = ["negative","neutral","positive"];
+const MODEL = "nvidia/nemotron-3.5-super-vl:free"; // verified $0 on OpenRouter (2026-10-29); hardcoded, never user-settable
+const MAX_CHARS = 2000;
+const SYSTEM_PROMPT = `You are a review-analysis component in a reputation-management pipeline.
+Extract every distinct issue or praise point in the customer's review as an "aspect".
+
+Rules:
+- Use ONLY these categories: ${CATEGORIES.join(", ")}
+- One review can have several aspects (e.g. praise for product, complaint about staff).
+- "evidence" must be a short verbatim quote copied from the review.
+- "severity" is 1 (trivial) to 5 (serious) and rates the aspect, not the whole review.
+- Reply with JSON only, in exactly this shape:
+  {"aspects": [{"category": "...", "sentiment": "negative|neutral|positive", "severity": 1, "evidence": "..."}]}`;
+
+const SAMPLE_REVIEWS = [
+  {"id": "r01", "branch": "Jaipur C-Scheme", "date": "2026-10-03", "rating": 2, "text": "Waited almost 40 minutes for our order even though the place was half empty. Nobody apologised."},
+  {"id": "r02", "branch": "Jaipur C-Scheme", "date": "2026-10-05", "rating": 3, "text": "The paneer tikka was genuinely good, but the service was so slow we nearly left before dessert."},
+  {"id": "r03", "branch": "Jaipur C-Scheme", "date": "2026-10-08", "rating": 1, "text": "The manager was rude when I pointed out a billing error. They charged us for an extra dessert we never ordered."},
+  {"id": "r04", "branch": "Jaipur C-Scheme", "date": "2026-10-11", "rating": 4, "text": "Nice ambience and clean tables. Food took a while but the staff kept us updated."},
+  {"id": "r05", "branch": "Jaipur C-Scheme", "date": "2026-10-14", "rating": 2, "text": "Took forever to get seated and then forever again to get the bill. Two visits in a row now."},
+  {"id": "r06", "branch": "Malviya Nagar", "date": "2026-10-02", "rating": 2, "text": "Tables were sticky and the washroom was not clean. Expected better at this price."},
+  {"id": "r07", "branch": "Malviya Nagar", "date": "2026-10-06", "rating": 3, "text": "Great, another 35 minutes waiting for a simple coffee. At least the coffee was decent."},
+  {"id": "r08", "branch": "Malviya Nagar", "date": "2026-10-09", "rating": 5, "text": "Ramesh at the counter was super helpful and remembered our usual order. Quick service too."},
+  {"id": "r09", "branch": "Malviya Nagar", "date": "2026-10-12", "rating": 2, "text": "Portions have shrunk but prices went up. Feels expensive for what you get now."},
+  {"id": "r10", "branch": "Malviya Nagar", "date": "2026-10-15", "rating": 4, "text": "Came back because my first order was made wrong, but they fixed it quickly and politely."},
+  {"id": "r11", "branch": "Vaishali Nagar", "date": "2026-10-04", "rating": 1, "text": "The coffee machine has been broken for two weeks and half the menu is unavailable."},
+  {"id": "r12", "branch": "Vaishali Nagar", "date": "2026-10-07", "rating": 4, "text": "Staff is polite and the place looks great, but the cold brew tasted watered down."},
+  {"id": "r13", "branch": "Vaishali Nagar", "date": "2026-10-10", "rating": 2, "text": "The bill had a service charge nobody mentioned, and the menu prices did not match what was charged."},
+  {"id": "r14", "branch": "Vaishali Nagar", "date": "2026-10-13", "rating": 5, "text": "Best croissant in Jaipur, hands down. Service was fast and friendly this time."},
+  {"id": "r15", "branch": "Vaishali Nagar", "date": "2026-10-16", "rating": 2, "text": "A staff member was arguing loudly with a customer at the next table. Very uncomfortable."}
+];
+const CANNED = {
+  "r01": [{"category": "service_speed", "sentiment": "negative", "severity": 4, "evidence": "Waited almost 40 minutes for our order"}],
+  "r02": [{"category": "product_quality", "sentiment": "positive", "severity": 2, "evidence": "The paneer tikka was genuinely good"}, {"category": "service_speed", "sentiment": "negative", "severity": 4, "evidence": "the service was so slow we nearly left before dessert"}],
+  "r03": [{"category": "staff_behavior", "sentiment": "negative", "severity": 4, "evidence": "The manager was rude"}, {"category": "pricing_billing", "sentiment": "negative", "severity": 4, "evidence": "charged us for an extra dessert we never ordered"}],
+  "r04": [{"category": "cleanliness_ambience", "sentiment": "positive", "severity": 1, "evidence": "Nice ambience and clean tables"}, {"category": "service_speed", "sentiment": "negative", "severity": 2, "evidence": "Food took a while"}],
+  "r05": [{"category": "service_speed", "sentiment": "negative", "severity": 4, "evidence": "Took forever to get seated and then forever again to get the bill"}],
+  "r06": [{"category": "cleanliness_ambience", "sentiment": "negative", "severity": 4, "evidence": "Tables were sticky and the washroom was not clean"}],
+  "r07": [{"category": "service_speed", "sentiment": "negative", "severity": 3, "evidence": "another 35 minutes waiting for a simple coffee"}],
+  "r08": [{"category": "staff_behavior", "sentiment": "positive", "severity": 1, "evidence": "Ramesh at the counter was super helpful"}, {"category": "service_speed", "sentiment": "positive", "severity": 1, "evidence": "Quick service too"}],
+  "r09": [{"category": "pricing_billing", "sentiment": "negative", "severity": 3, "evidence": "Portions have shrunk but prices went up"}],
+  "r10": [{"category": "product_quality", "sentiment": "negative", "severity": 3, "evidence": "my first order was made wrong"}, {"category": "staff_behavior", "sentiment": "positive", "severity": 2, "evidence": "they fixed it quickly and politely"}],
+  "r11": [{"category": "product_quality", "sentiment": "negative", "severity": 4, "evidence": "The coffee machine has been broken for two weeks and half the menu is unavailable"}],
+  "r12": [{"category": "staff_behavior", "sentiment": "positive", "severity": 1, "evidence": "Staff is polite"}, {"category": "product_quality", "sentiment": "negative", "severity": 2, "evidence": "the cold brew tasted watered down"}],
+  "r13": [{"category": "pricing_billing", "sentiment": "negative", "severity": 4, "evidence": "The bill had a service charge nobody mentioned"}],
+  "r14": [{"category": "product_quality", "sentiment": "positive", "severity": 1, "evidence": "Best croissant in Jaipur"}, {"category": "service_speed", "sentiment": "positive", "severity": 1, "evidence": "Service was fast and friendly"}],
+  "r15": [{"category": "staff_behavior", "sentiment": "negative", "severity": 4, "evidence": "A staff member was arguing loudly with a customer"}]
+};
+
+let liveCustomN = 0, liveBatchN = 0;
+const LIVE_CUSTOM_LIMIT = 8, LIVE_BATCH_LIMIT = 2;
+const $ = id => document.getElementById(id);
+
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function table(headers, rows){
+  if(!rows.length) return "";
+  let h = "<table><tr>" + headers.map(x=>`<th>${esc(x)}</th>`).join("") + "</tr>";
+  for(const r of rows) h += "<tr>" + r.map(c=>`<td>${esc(c)}</td>`).join("") + "</tr>";
+  return h + "</table>";
+}
+
+function parseClassification(raw){
+  let text = raw.trim();
+  const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if(fence) text = fence[1].trim();
+  const start = text.indexOf("{"), end = text.lastIndexOf("}");
+  if(start === -1 || end <= start) throw new Error("no JSON object found in model output");
+  const data = JSON.parse(text.slice(start, end+1));
+  if(!Array.isArray(data.aspects)) throw new Error("model output has no aspects list");
+  return data.aspects.filter(a => a && typeof a === "object").map(a => ({
+    category: CATEGORIES.includes(a.category) ? a.category : "other",
+    sentiment: SENTIMENTS.includes(a.sentiment) ? a.sentiment : "neutral",
+    severity: Math.max(1, Math.min(5, parseInt(a.severity) || 3)),
+    evidence: String(a.evidence || "").slice(0, 200),
+  }));
+}
+
+function summarize(classified){
+  const byBranch = {};
+  for(const item of classified){
+    for(const asp of item.aspects){
+      const b = byBranch[item.branch] = byBranch[item.branch] || {};
+      const s = b[asp.category] = b[asp.category] || {negative:0, neutral:0, positive:0, sev_sum:0, sev_n:0, evidence:[]};
+      s[asp.sentiment]++;
+      if(asp.sentiment === "negative"){
+        s.sev_sum += asp.severity; s.sev_n++;
+        if(asp.evidence) s.evidence.push(asp.evidence);
+      }
+    }
+  }
+  const summary = {};
+  for(const [branch, cats] of Object.entries(byBranch)){
+    const issues = Object.entries(cats).map(([cat, s]) => ({
+      category: cat,
+      negative_mentions: s.negative,
+      avg_negative_severity: s.sev_n ? Math.round(100*s.sev_sum/s.sev_n)/100 : null,
+      priority_score: Math.round(100*s.sev_sum)/100,
+      evidence_examples: s.evidence.slice(0,3),
+    })).sort((x,y) => y.priority_score - x.priority_score);
+    summary[branch] = issues;
+  }
+  return summary;
+}
+
+async function callOpenRouter(review, key){
+  const messages = [
+    {role:"system", content: SYSTEM_PROMPT},
+    {role:"user", content: `Branch: ${review.branch}\nDate: ${review.date}\nStar rating: ${review.rating}/5\nReview: ${review.text}`},
+  ];
+  const resp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {"Authorization": "Bearer " + key, "Content-Type": "application/json"},
+    body: JSON.stringify({model: MODEL, messages, response_format: {type: "json_object"}}),
+  });
+  if(!resp.ok) throw new Error("HTTP " + resp.status);
+  const body = await resp.json();
+  return body.choices[0].message.content;
+}
+
+$("analyzeBtn").addEventListener("click", async () => {
+  const st = $("customStatus"); st.className = "status"; $("customOut").innerHTML = "";
+  const text = $("review").value.trim();
+  if(!text){ st.textContent = "Paste a review first."; return; }
+  if(text.length > MAX_CHARS){ st.textContent = `Review is ${text.length} characters; the demo limit is ${MAX_CHARS}.`; return; }
+  if(liveCustomN >= LIVE_CUSTOM_LIMIT){ st.textContent = `This page has reached its ${LIVE_CUSTOM_LIMIT} live-analysis demo limit. Reload to reset.`; return; }
+  const key = $("key").value.trim();
+  if(!key){ st.innerHTML = '<span class="err">Live analysis needs your own OpenRouter key (free at openrouter.ai). The batch below runs with canned data without any key.</span>'; return; }
+  liveCustomN++;
+  $("analyzeBtn").disabled = true; st.textContent = "Asking the model...";
+  try {
+    const raw = await callOpenRouter({branch: $("branch").value.trim() || "Unspecified branch", date: "live-demo", rating: parseInt($("rating").value), text}, key);
+    const aspects = parseClassification(raw);
+    st.textContent = `Analyzed by ${MODEL} via OpenRouter (your key, browser-direct).`;
+    $("customOut").innerHTML = table(["category","sentiment","severity","evidence"], aspects.map(a=>[a.category,a.sentiment,a.severity,a.evidence]));
+  } catch(e){
+    st.innerHTML = `<span class="err">Could not analyze: ${esc(e.message)}. The free model can be rate-limited at busy times - wait a moment and retry.</span>`;
+  } finally { $("analyzeBtn").disabled = false; }
+});
+
+function renderBatch(classified, note){
+  $("batchStatus").textContent = note;
+  const summary = summarize(classified);
+  const srows = [];
+  for(const [branch, issues] of Object.entries(summary))
+    for(const i of issues)
+      if(i.negative_mentions > 0)
+        srows.push([branch, i.category, i.negative_mentions, i.avg_negative_severity, i.priority_score, i.evidence_examples.join(" | ")]);
+  const arows = [];
+  for(const item of classified)
+    for(const a of item.aspects)
+      arows.push([item.branch, item.review_id, a.category, a.sentiment, a.severity, a.evidence]);
+  $("summaryOut").innerHTML = "<h2 style='font-size:1rem'>Per-branch issue ranking</h2>" + table(["branch","category","negative mentions","avg severity","priority score","evidence examples"], srows);
+  $("aspectsOut").innerHTML = "<h2 style='font-size:1rem'>All extracted aspects</h2>" + table(["branch","review","category","sentiment","severity","evidence"], arows);
+}
+
+$("batchMockBtn").addEventListener("click", () => {
+  const classified = SAMPLE_REVIEWS.map(r => ({review_id: r.id, branch: r.branch, aspects: CANNED[r.id]}));
+  renderBatch(classified, "Canned-fixtures run: replays saved model responses against the same analytics pipeline (proves the pipeline, not the model).");
+});
+
+$("batchLiveBtn").addEventListener("click", async () => {
+  const st = $("batchStatus"); st.className = "status";
+  if(liveBatchN >= LIVE_BATCH_LIMIT){ st.textContent = `This page has reached its ${LIVE_BATCH_LIMIT} live-batch demo limit. Reload to reset, or use canned replay.`; return; }
+  const key = $("key").value.trim();
+  if(!key){ st.innerHTML = '<span class="err">Live batch needs your own OpenRouter key above (free at openrouter.ai).</span>'; return; }
+  liveBatchN++;
+  $("batchLiveBtn").disabled = true;
+  const classified = [];
+  try {
+    for(let i=0; i<SAMPLE_REVIEWS.length; i++){
+      const r = SAMPLE_REVIEWS[i];
+      st.textContent = `Live batch: ${i+1}/${SAMPLE_REVIEWS.length} reviews...`;
+      const raw = await callOpenRouter(r, key);
+      classified.push({review_id: r.id, branch: r.branch, aspects: parseClassification(raw)});
+    }
+    renderBatch(classified, `Live run: ${SAMPLE_REVIEWS.length} reviews classified by ${MODEL} via OpenRouter (your key, browser-direct).`);
+  } catch(e){
+    st.innerHTML = `<span class="err">Batch stopped: ${esc(e.message)}. The free model can be rate-limited; canned replay still works.</span>`;
+  } finally { $("batchLiveBtn").disabled = false; }
+});
+</script>
+</body>
+</html>
