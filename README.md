@@ -6,6 +6,10 @@
 - **Submission:** candidate portal (https://cynbit.in/candidate/cmt8cbikl000004l40fphlaj2) - 1 primary link + up to 4 additional links + optional notes
 - **Visibility:** this repo is public for submission.
 
+## Interactive demo
+- **Browser demo (hosted on GitHub Pages):** https://pranav8764.github.io/cynbit-ai-opportunity-assessment/demo.html - runs the 15-review sample batch through the analytics pipeline instantly (canned replay) and can analyze any pasted review live when you supply your own free OpenRouter key (browser-direct, never stored).
+- **`streamlit_app.py`** - Streamlit version of the same demo UI for local runs (`pip install streamlit && streamlit run streamlit_app.py`); `docs/demo.html` is the static Pages source.
+
 ## Reports
 - [AI Opportunity Report](docs/AI_OPPORTUNITY_REPORT.md)
 - [Technical Approach Report](docs/TECHNICAL_APPROACH_REPORT.md)
@@ -78,4 +82,3 @@ docs/evaluation-plan.md           baseline-vs-model evaluation plan (no results 
 - Cynbit Technologies, Jaipur. Services: AI agents/automation, custom software, cloud, web/mobile, technical SEO (https://www.cynbit.in/services)
 - Products: Cynbit Studio (career/coding), TenantEase (property), Revio (review/reputation AI) (https://www.cynbit.in/products)
 - Case studies: https://www.cynbit.in/case-studies
-
